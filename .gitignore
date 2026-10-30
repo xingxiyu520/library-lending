@@ -1,0 +1,15 @@
+**/bin/
+**/obj/
+.vs/
+.idea/
+TestResults/
+artifacts/
+.local/
+.env
+.env.*
+**/appsettings.Local.json
+**/appsettings.*.local.json
+*.user
+*.suo
+PRD.md
+Sprint_Plan.md
