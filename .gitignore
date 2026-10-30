@@ -17,3 +17,14 @@ Sprint_Plan.md
 *.trx
 *.diag
 *.log
+
+evidence/
+proof/
+
+docs/
+README.md
+screenshots/
+*.md
+*.pdf
+*.docx
+*.xlsx
