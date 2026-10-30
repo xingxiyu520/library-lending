@@ -13,3 +13,7 @@ artifacts/
 *.suo
 PRD.md
 Sprint_Plan.md
+
+*.trx
+*.diag
+*.log

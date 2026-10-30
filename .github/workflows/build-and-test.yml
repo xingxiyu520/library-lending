@@ -1,0 +1,29 @@
+name: Build and test
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: ci-ephemeral-mysql-password
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -pci-ephemeral-mysql-password"
+          --health-interval=10s --health-timeout=5s --health-retries=12
+    env:
+      LIBRARY_TEST_CONNECTION: Server=127.0.0.1;Port=3306;User ID=root;Password=ci-ephemeral-mysql-password;SslMode=Preferred;AllowPublicKeyRetrieval=True
+      LIBRARY_TEST_BROWSER: chrome
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - run: dotnet restore LibraryLending.sln
+      - run: dotnet build LibraryLending.sln --configuration Release --no-restore --warnaserror
+      - run: dotnet test LibraryLending.sln --configuration Release --no-build -- --report-trx --results-directory TestResults --minimum-expected-tests 69 --no-progress

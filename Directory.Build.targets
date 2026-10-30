@@ -1,0 +1,1 @@
+<Project><PropertyGroup Condition="'$(IsTestProject)' == 'true'"><RunSettingsFilePath>$(MSBuildThisFileDirectory)Library.runsettings</RunSettingsFilePath></PropertyGroup></Project>

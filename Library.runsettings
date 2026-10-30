@@ -1,0 +1,1 @@
+<?xml version="1.0" encoding="utf-8"?><RunSettings><RunConfiguration><MaxCpuCount>1</MaxCpuCount><ResultsDirectory>TestResults</ResultsDirectory><TestSessionTimeout>300000</TestSessionTimeout></RunConfiguration><MSTest><MapInconclusiveToFailed>true</MapInconclusiveToFailed></MSTest></RunSettings>
