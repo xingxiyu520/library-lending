@@ -29,23 +29,28 @@ public class BrowserTests {
   try { return ((string)((IJavaScriptExecutor)d).ExecuteScript("return document.body ? document.body.innerText : ''")).Contains(text); }
   catch(WebDriverException ex) when(ex.Message.Contains("Node with given id") || ex.Message.Contains("execution context was destroyed")) { return false; }
  });
+ private void CaptureEvidence(string step) {
+  var folder=Path.Combine(env.Root,"TestResults","demo");Directory.CreateDirectory(folder);
+  var path=Path.Combine(folder,TestContext.TestName+"-"+step+".png");
+  ((ITakesScreenshot)driver).GetScreenshot().SaveAsFile(path);TestContext.AddResultFile(path);
+ }
  [TestMethod] public void Admin_login_and_logout_in_real_browser() {
-  Login("admin@library.example");WaitText("LIBRARY WORKSPACE · ADMIN");driver.FindElement(By.CssSelector("nav button[type=submit]")).Click();WaitText("Sign in to your library");driver.Navigate().GoToUrl(env.BrowserUrl+"/Books");wait.Until(d=>d.Url.Contains("/Account/Login"));
+  Login("admin@library.example");WaitText("LIBRARY WORKSPACE · ADMIN");CaptureEvidence("01-admin-home");driver.FindElement(By.CssSelector("nav button[type=submit]")).Click();WaitText("Sign in to your library");CaptureEvidence("admin-logout");driver.Navigate().GoToUrl(env.BrowserUrl+"/Books");wait.Until(d=>d.Url.Contains("/Account/Login"));
  }
  [TestMethod] public void Reader_login_and_direct_admin_access_are_isolated() {
-  Login("reader@library.example");WaitText("READER WORKSPACE");Assert.AreEqual(0,driver.FindElements(By.CssSelector("nav a[href='/Readers']")).Count);driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers");WaitText("Access denied");
+  Login("reader@library.example");WaitText("READER WORKSPACE");Assert.AreEqual(0,driver.FindElements(By.CssSelector("nav a[href='/Readers']")).Count);driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers");WaitText("Access denied");CaptureEvidence("reader-access-denied");
  }
  [TestMethod] public void Invalid_login_shows_generic_feedback() {
-  Login("unknown@library.example","BadPassword9");WaitText("Unable to sign in with these credentials.");Assert.AreEqual("",driver.FindElement(By.Id("Password")).GetDomProperty("value"));
+  Login("unknown@library.example","BadPassword9");WaitText("Unable to sign in with these credentials.");Assert.AreEqual("",driver.FindElement(By.Id("Password")).GetDomProperty("value"));CaptureEvidence("invalid-login");
  }
  [TestMethod] public void Admin_can_add_book_create_reader_and_record_loan() {
   var suffix=Guid.NewGuid().ToString("N");var title="Browser book "+suffix;var name="Browser reader "+suffix;var email=suffix+"@library.example";
-  Login("admin@library.example");WaitText("LIBRARY WORKSPACE · ADMIN");
-  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books/Create");driver.FindElement(By.Id("Isbn")).SendKeys(suffix);driver.FindElement(By.Id("Title")).SendKeys(title);driver.FindElement(By.Id("Author")).SendKeys("Test Author");driver.FindElement(By.Id("TotalCopies")).SendKeys("1");driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Book added to the catalog.");WaitText(title);
-  driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers/Create");driver.FindElement(By.Id("Name")).SendKeys(name);driver.FindElement(By.Id("Email")).SendKeys(email);driver.FindElement(By.Id("Password")).SendKeys(env.Password);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Reader and login account created.");
-  driver.Navigate().GoToUrl(env.BrowserUrl+"/Loans/Create");new SelectElement(driver.FindElement(By.Id("BookId"))).SelectByText(title+" (1 available)");new SelectElement(driver.FindElement(By.Id("ReaderId"))).SelectByText(name+" — "+email);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Loan recorded.");WaitText(title);WaitText(name);WaitText("On loan");
-  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books");var row=driver.FindElements(By.CssSelector("tbody tr")).Single(x=>x.Text.Contains(title));StringAssert.Contains(row.Text,"0 available");
-  driver.FindElement(By.CssSelector("nav button[type=submit]")).Click();WaitText("Sign in to your library");Login(email);WaitText("READER WORKSPACE");
+  Login("admin@library.example");WaitText("LIBRARY WORKSPACE · ADMIN");CaptureEvidence("01-admin-home");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books/Create");driver.FindElement(By.Id("Isbn")).SendKeys(suffix);driver.FindElement(By.Id("Title")).SendKeys(title);driver.FindElement(By.Id("Author")).SendKeys("Test Author");driver.FindElement(By.Id("TotalCopies")).SendKeys("1");driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Book added to the catalog.");WaitText(title);CaptureEvidence("02-book-created");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers/Create");driver.FindElement(By.Id("Name")).SendKeys(name);driver.FindElement(By.Id("Email")).SendKeys(email);driver.FindElement(By.Id("Password")).SendKeys(env.Password);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Reader and login account created.");CaptureEvidence("03-reader-created");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Loans/Create");new SelectElement(driver.FindElement(By.Id("BookId"))).SelectByText(title+" (1 available)");new SelectElement(driver.FindElement(By.Id("ReaderId"))).SelectByText(name+" — "+email);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Loan recorded.");WaitText(title);WaitText(name);WaitText("On loan");CaptureEvidence("04-loan-recorded");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books");var row=driver.FindElements(By.CssSelector("tbody tr")).Single(x=>x.Text.Contains(title));StringAssert.Contains(row.Text,"0 available");CaptureEvidence("05-zero-available");
+  driver.FindElement(By.CssSelector("nav button[type=submit]")).Click();WaitText("Sign in to your library");Login(email);WaitText("READER WORKSPACE");CaptureEvidence("06-reader-home");
  }
  [TestMethod] public void Login_layout_fits_a_narrow_viewport() {
   driver.Manage().Window.Size=new System.Drawing.Size(390,844);driver.Navigate().GoToUrl(env.BrowserUrl+"/Account/Login");WaitText("Sign in to your library");
