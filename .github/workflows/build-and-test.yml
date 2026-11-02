@@ -1,11 +1,14 @@
+# 每次推送或拉取请求均构建并运行同一MSTest程序集；不上传本地报告、日志或截图。
 name: Build and test
 on: [push, pull_request]
+# 工作流只需读取源代码。
 permissions:
   contents: read
 jobs:
   verify:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # 临时MySQL服务只供本次CI使用，凭据为公开的临时测试值。
     services:
       mysql:
         image: mysql:8.4
@@ -19,6 +22,7 @@ jobs:
     env:
       LIBRARY_TEST_CONNECTION: Server=127.0.0.1;Port=3306;User ID=root;Password=ci-ephemeral-mysql-password;SslMode=Preferred;AllowPublicKeyRetrieval=True
       LIBRARY_TEST_BROWSER: chrome
+    # 准备.NET、Java与JMeter，Linux代理使用Chrome执行真实浏览器测试。
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
@@ -31,6 +35,8 @@ jobs:
       - name: Configure JMeter
         shell: pwsh
         run: ./scripts/Install-JMeter.ps1
+      # 安全分析器随构建执行，任何警告均导致失败。
       - run: dotnet restore LibraryLending.sln
       - run: dotnet build LibraryLending.sln --configuration Release --no-restore --warnaserror
-      - run: dotnet test LibraryLending.sln --configuration Release --no-build -- --report-trx --results-directory TestResults --minimum-expected-tests 146 --no-progress
+      # 数量门槛防止零测试假通过，包含1/5/10独立会话持续负载。
+      - run: dotnet test LibraryLending.sln --configuration Release --no-build -- --report-trx --results-directory TestResults --minimum-expected-tests 211 --no-progress

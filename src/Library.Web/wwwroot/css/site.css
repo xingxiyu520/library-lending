@@ -1,3 +1,553 @@
-:root{--ink:#203c36;--muted:#687a72;--paper:#f6f6ef;--green:#235a44;--line:#dce2d6}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:"Segoe UI",Arial,sans-serif;font-size:16px;line-height:1.6}a{color:var(--green);text-decoration:none}a:hover{text-decoration:underline}.topbar{min-height:88px;background:#fff;padding:20px 6%;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{font-size:21px;font-weight:700;display:flex;align-items:center;gap:12px}.brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--green);color:#fff;font-family:Georgia,serif;font-size:29px}nav{display:flex;align-items:center;gap:28px}nav form{margin:0}main{max-width:1200px;margin:58px auto;min-height:65vh;padding:0 28px}h1{font-family:Georgia,serif;font-size:44px;font-weight:500;line-height:1.16;margin:12px 0 20px}h2{font-size:24px;line-height:1.3;margin:14px 0}p{margin:0 0 20px}.eyebrow{font-size:11px;font-weight:700;letter-spacing:2px;margin-bottom:12px;color:var(--green)}.lead,.muted{color:var(--muted)}.lead{font-size:19px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:42px}.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:34px}.action{color:var(--ink)}.action:hover{border-color:var(--green);text-decoration:none}.action p{color:var(--muted);min-height:56px}.action>span:last-child{font-size:14px;font-weight:600}.number{display:inline-block;background:var(--paper);padding:8px 14px;border-radius:12px;color:var(--muted)}.page-heading{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:30px}.page-heading h1{margin-bottom:8px}.page-heading p{margin-bottom:0}.button,button{display:inline-block;background:var(--green);color:#fff;border:0;border-radius:8px;padding:12px 22px;font:600 14px "Segoe UI",sans-serif;cursor:pointer;white-space:nowrap}.button:hover,button:hover{background:#184332;text-decoration:none}.quiet{background:transparent;color:var(--ink);border:1px solid var(--line)}.quiet:hover{color:#fff}button:disabled{opacity:.6;cursor:wait}.table-wrap{background:#fff;border:1px solid var(--line);border-radius:16px;overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap}th{font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);background:#f0f3eb}th,td{padding:20px 24px;border-bottom:1px solid var(--line)}tr:last-child td{border-bottom:0}small{display:block;font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:4px 11px;background:#e9f0df;color:var(--green);border-radius:20px;font-size:12px}.empty{text-align:center;color:var(--muted);padding:35px}.form-card{max-width:650px}label{display:block;font-weight:600;font-size:14px;margin:18px 0 6px}input,select{width:100%;font:inherit;color:var(--ink);padding:10px 12px;border:1px solid #b8c4b8;background:#fff;border-radius:7px}input:focus,select:focus{outline:2px solid #8fab6b;outline-offset:2px}.form-actions{display:flex;gap:24px;align-items:center;margin-top:28px}.validation{display:block;color:#a42a25;font-size:13px}.validation ul{padding-left:18px}.notice{padding:14px 20px;border:1px solid #a9c49c;border-radius:10px;background:#eef5e9;margin-bottom:25px}.login-layout{display:grid;grid-template-columns:1.2fr 1fr;gap:70px;align-items:center}.intro h1{font-size:49px}.intro>p:not(.eyebrow){color:var(--muted);max-width:370px}.login-card{padding:40px}.login-card button{margin-top:28px;width:100%}.book-art{display:flex;align-items:flex-end;gap:7px;margin-top:48px;height:145px}.book-art span{writing-mode:vertical-rl;transform:rotate(180deg);background:var(--green);color:#fff;border-radius:6px;padding:14px 20px;height:145px;letter-spacing:3px;font-size:11px}.book-art span:nth-child(2){height:125px;background:#a6b87d;color:var(--ink)}.book-art span:nth-child(3){height:137px;background:#d3b57e;color:var(--ink)}footer{padding:25px 6%;border-top:1px solid var(--line);font-size:12px;color:var(--muted);display:flex;justify-content:space-between}@media(max-width:800px){.topbar{align-items:flex-start;flex-direction:column}nav{flex-wrap:wrap;gap:20px}main{margin-top:32px}.grid,.login-layout{grid-template-columns:1fr}.login-layout{gap:25px}.book-art{display:none}h1,.intro h1{font-size:36px}.page-heading{align-items:flex-start;flex-direction:column}.card{padding:24px}footer span{display:none}}
+/* 全站色板：文字、弱化文字、背景、主色和分隔线。 */
+:root {
+    --ink: #203c36;
+    --muted: #687a72;
+    --paper: #f6f6ef;
+    --green: #235a44;
+    --line: #dce2d6;
+}
 
-.search-bar{display:flex;gap:18px;align-items:end;flex-wrap:wrap;margin-bottom:28px}.search-bar>div:first-child{flex:1;min-width:200px}.search-bar>div:nth-child(2){min-width:200px}.search-bar label{margin-top:0}.search-bar>a{padding-bottom:11px}.badge.overdue{color:#8b241e;background:#fbe4dd;font-weight:700}@media(max-width:600px){.search-bar>div{width:100%}}
+/* 宽高计算包含内边距和边框，避免布局溢出。 */
+* {
+    box-sizing: border-box;
+}
+
+/* 基础背景、字体和正文行距。 */
+body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "Segoe UI",Arial,sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+/* 链接使用主题色，保持内容层级。 */
+a {
+    color: var(--green);
+    text-decoration: none;
+}
+
+/* 悬停链接提供下划线反馈。 */
+a:hover {
+    text-decoration: underline;
+}
+
+/* 顶部品牌与导航的横向排列。 */
+.topbar {
+    min-height: 88px;
+    background: #fff;
+    padding: 20px 6%;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+/* 品牌名称的字体和图标间距。 */
+.brand {
+    font-size: 21px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* 品牌方块图标的尺寸、配色和居中。 */
+.brand-mark {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: var(--green);
+    color: #fff;
+    font-family: Georgia,serif;
+    font-size: 29px;
+}
+
+/* 导航操作横向排列。 */
+nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+}
+
+/* 退出表单与导航链接保持一致间距。 */
+nav form {
+    margin: 0;
+}
+
+/* 页面主体最大宽度、留白和最小高度。 */
+main {
+    max-width: 1200px;
+    margin: 58px auto;
+    min-height: 65vh;
+    padding: 0 28px;
+}
+
+/* 页面主标题字体与垂直间距。 */
+h1 {
+    font-family: Georgia,serif;
+    font-size: 44px;
+    font-weight: 500;
+    line-height: 1.16;
+    margin: 12px 0 20px;
+}
+
+/* 卡片标题的字号与行高。 */
+h2 {
+    font-size: 24px;
+    line-height: 1.3;
+    margin: 14px 0;
+}
+
+/* 正文段落间距。 */
+p {
+    margin: 0 0 20px;
+}
+
+/* 标题上方的小型分类提示。 */
+.eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    color: var(--green);
+}
+
+/* 说明文字采用弱化颜色。 */
+.lead,.muted {
+    color: var(--muted);
+}
+
+/* 导语字号。 */
+.lead {
+    font-size: 19px;
+}
+
+/* 工作台功能卡片使用三列网格。 */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    gap: 24px;
+    margin-top: 42px;
+}
+
+/* 白色卡片的边框、圆角与内容留白。 */
+.card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 34px;
+}
+
+/* 可点击卡片的文字颜色。 */
+.action {
+    color: var(--ink);
+}
+
+/* 可点击卡片悬停时突出边框。 */
+.action:hover {
+    border-color: var(--green);
+    text-decoration: none;
+}
+
+/* 卡片说明文字的颜色和最小高度。 */
+.action p {
+    color: var(--muted);
+    min-height: 56px;
+}
+
+/* 卡片末尾操作提示的字号和字重。 */
+.action>span:last-child {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+/* 工作台编号徽章。 */
+.number {
+    display: inline-block;
+    background: var(--paper);
+    padding: 8px 14px;
+    border-radius: 12px;
+    color: var(--muted);
+}
+
+/* 标题与主要操作并排对齐。 */
+.page-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 30px;
+}
+
+/* 标题区主标题下方间距。 */
+.page-heading h1 {
+    margin-bottom: 8px;
+}
+
+/* 标题区说明不追加段落间距。 */
+.page-heading p {
+    margin-bottom: 0;
+}
+
+/* 链接式按钮和真实按钮共用主操作外观。 */
+.button,button {
+    display: inline-block;
+    background: var(--green);
+    color: #fff;
+    border: 0;
+    border-radius: 8px;
+    padding: 12px 22px;
+    font: 600 14px "Segoe UI",sans-serif;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/* 主操作悬停颜色。 */
+.button:hover,button:hover {
+    background: #184332;
+    text-decoration: none;
+}
+
+/* 次要按钮使用透明背景和描边。 */
+.quiet {
+    background: transparent;
+    color: var(--ink);
+    border: 1px solid var(--line);
+}
+
+/* 次要按钮悬停文字与深色背景保持对比。 */
+.quiet:hover {
+    color: #fff;
+}
+
+/* 提交中的按钮弱化显示并采用等待指针。 */
+button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+/* 表格容器允许横向滚动以适配窄屏。 */
+.table-wrap {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    overflow-x: auto;
+}
+
+/* 表格铺满容器并合并边框。 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    white-space: nowrap;
+}
+
+/* 表头采用弱化色和大写样式。 */
+th {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .7px;
+    color: var(--muted);
+    background: #f0f3eb;
+}
+
+/* 单元格留白及行分隔。 */
+th,td {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--line);
+}
+
+/* 末行不重复显示底部边框。 */
+tr:last-child td {
+    border-bottom: 0;
+}
+
+/* ISBN等辅助信息单独显示。 */
+small {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+}
+
+/* 可借数量及状态的基础徽章外观。 */
+.badge {
+    display: inline-block;
+    padding: 4px 11px;
+    background: #e9f0df;
+    color: var(--green);
+    border-radius: 20px;
+    font-size: 12px;
+}
+
+/* 无匹配结果时的居中说明。 */
+.empty {
+    text-align: center;
+    color: var(--muted);
+    padding: 35px;
+}
+
+/* 编辑表单限制宽度以便阅读。 */
+.form-card {
+    max-width: 650px;
+}
+
+/* 输入标签的字重及间距。 */
+label {
+    display: block;
+    font-weight: 600;
+    font-size: 14px;
+    margin: 18px 0 6px;
+}
+
+/* 输入框和选择器的基础尺寸、字体和边框。 */
+input,select {
+    width: 100%;
+    font: inherit;
+    color: var(--ink);
+    padding: 10px 12px;
+    border: 1px solid #b8c4b8;
+    background: #fff;
+    border-radius: 7px;
+}
+
+/* 键盘焦点轮廓，帮助定位当前字段。 */
+input:focus,select:focus {
+    outline: 2px solid #8fab6b;
+    outline-offset: 2px;
+}
+
+/* 确认和取消操作横向排列。 */
+.form-actions {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    margin-top: 28px;
+}
+
+/* 字段错误使用醒目的文字颜色。 */
+.validation {
+    display: block;
+    color: #a42a25;
+    font-size: 13px;
+}
+
+/* 模型错误列表的缩进。 */
+.validation ul {
+    padding-left: 18px;
+}
+
+/* 保存成功后的一次性提示。 */
+.notice {
+    padding: 14px 20px;
+    border: 1px solid #a9c49c;
+    border-radius: 10px;
+    background: #eef5e9;
+    margin-bottom: 25px;
+}
+
+/* 登录介绍与表单的双列布局。 */
+.login-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 70px;
+    align-items: center;
+}
+
+/* 登录页标题字号。 */
+.intro h1 {
+    font-size: 49px;
+}
+
+/* 登录介绍文字的宽度与颜色。 */
+.intro>p:not(.eyebrow) {
+    color: var(--muted);
+    max-width: 370px;
+}
+
+/* 登录卡片内部留白。 */
+.login-card {
+    padding: 40px;
+}
+
+/* 登录按钮铺满表单宽度。 */
+.login-card button {
+    margin-top: 28px;
+    width: 100%;
+}
+
+/* 装饰书脊布局；小屏隐藏以留出表单空间。 */
+.book-art {
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+    margin-top: 48px;
+    height: 145px;
+}
+
+/* 装饰书脊的竖排文字与形状。 */
+.book-art span {
+    writing-mode: vertical-rl;
+    transform: rotate(180deg);
+    background: var(--green);
+    color: #fff;
+    border-radius: 6px;
+    padding: 14px 20px;
+    height: 145px;
+    letter-spacing: 3px;
+    font-size: 11px;
+}
+
+/* 第二本装饰书的高度与配色。 */
+.book-art span:nth-child(2) {
+    height: 125px;
+    background: #a6b87d;
+    color: var(--ink);
+}
+
+/* 第三本装饰书的高度与配色。 */
+.book-art span:nth-child(3) {
+    height: 137px;
+    background: #d3b57e;
+    color: var(--ink);
+}
+
+/* 页脚的分隔、字号与两端排列。 */
+footer {
+    padding: 25px 6%;
+    border-top: 1px solid var(--line);
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+}
+
+/* 中小屏幕调整导航、网格和登录布局。 */
+@media(max-width:800px) {
+    /* 顶部品牌与导航的横向排列。 */
+    .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    /* 导航操作横向排列。 */
+    nav {
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    /* 页面主体最大宽度、留白和最小高度。 */
+    main {
+        margin-top: 32px;
+    }
+
+    /* 小屏卡片及登录布局改为单列。 */
+    .grid,.login-layout {
+        grid-template-columns: 1fr;
+    }
+
+    /* 登录介绍与表单的双列布局。 */
+    .login-layout {
+        gap: 25px;
+    }
+
+    /* 装饰书脊布局；小屏隐藏以留出表单空间。 */
+    .book-art {
+        display: none;
+    }
+
+    /* 小屏标题缩小字号。 */
+    h1,.intro h1 {
+        font-size: 36px;
+    }
+
+    /* 标题与主要操作并排对齐。 */
+    .page-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    /* 白色卡片的边框、圆角与内容留白。 */
+    .card {
+        padding: 24px;
+    }
+
+    /* 小屏隐藏页脚辅助标语。 */
+    footer span {
+        display: none;
+    }
+
+}
+
+/* 馆藏与读者查询工具栏允许换行。 */
+.search-bar {
+    display: flex;
+    gap: 18px;
+    align-items: end;
+    flex-wrap: wrap;
+    margin-bottom: 28px;
+}
+
+/* 关键词区域占用可用空间。 */
+.search-bar>div:first-child {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* 排序选择器保留可读宽度。 */
+.search-bar>div:nth-child(2) {
+    min-width: 200px;
+}
+
+/* 查询工具栏标签移除顶部留白。 */
+.search-bar label {
+    margin-top: 0;
+}
+
+/* 清空链接与输入框底部对齐。 */
+.search-bar>a {
+    padding-bottom: 11px;
+}
+
+/* 逾期状态用不同颜色及字重强调。 */
+.badge.overdue {
+    color: #8b241e;
+    background: #fbe4dd;
+    font-weight: 700;
+}
+
+/* 窄屏查询条件纵向排列。 */
+@media(max-width:600px) {
+    /* 窄屏下每个查询字段占一整行。 */
+    .search-bar>div {
+        width: 100%;
+    }
+
+}
+
+/* 借阅筛选器将每个标签与对应输入成组排列，组合筛选仍由GET请求处理。 */
+.search-form {
+    display: grid;
+    grid-template-columns: minmax(220px, 1.6fr) minmax(150px, 1fr) minmax(170px, 1fr) auto auto;
+    grid-template-rows: auto auto;
+    gap: 6px 16px;
+    align-items: end;
+    margin-bottom: 28px;
+}
+
+/* 标签位于第一行，输入与操作位于第二行，保持视觉阅读顺序。 */
+.search-form label { grid-row: 1; margin: 0; }
+.search-form input, .search-form select { grid-row: 2; }
+.search-form button, .search-form a { grid-row: 2; }
+.search-form a { padding-bottom: 11px; }
+
+/* 窄屏按DOM顺序纵向排列，避免筛选器横向溢出。 */
+@media (max-width: 800px) {
+    .search-form { display: flex; flex-direction: column; align-items: stretch; }
+    .search-form label { margin-top: 10px; }
+    .search-form a { align-self: flex-start; }
+}

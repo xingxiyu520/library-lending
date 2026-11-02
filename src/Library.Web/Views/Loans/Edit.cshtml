@@ -1,0 +1,37 @@
+@* 借阅日期更正页；关联对象和实际归还日期只读。 *@
+@model LoanEditInput
+@{ ViewData["Title"] = "Correct loan dates"; var loan = (Loan)ViewData["Loan"]!; }
+@* 关联对象只显示为文字，表单仅提交可更正的两个日期。 *@
+<p class="eyebrow">CIRCULATION</p>
+<h1>Correct loan dates</h1>
+<section class="card form-card">
+<p>
+<strong>@loan.Book.Title</strong> · @loan.Reader.Name</p>
+<p class="muted">Book and reader cannot be changed. A recorded return date stays unchanged.</p>
+@if(loan.ReturnDate.HasValue){
+<p>Returned @loan.ReturnDate.Value.ToString("yyyy-MM-dd")</p>
+}
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Edit" asp-route-id="@loan.Id" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+@* 借出日期输入，不能晚于业务当天。 *@
+<label asp-for="BorrowDate">
+</label>
+<input asp-for="BorrowDate" type="date" required/>
+<span asp-validation-for="BorrowDate" class="validation">
+</span>
+@* 应还日期输入，不能早于借出日期。 *@
+<label asp-for="DueDate">
+</label>
+<input asp-for="DueDate" type="date" required/>
+<span asp-validation-for="DueDate" class="validation">
+</span>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">
+<button type="submit">Save dates</button>
+<a asp-action="Index">Cancel</a>
+</div>
+</form>
+</section>

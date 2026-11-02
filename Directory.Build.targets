@@ -1,1 +1,7 @@
-<Project><PropertyGroup Condition="'$(IsTestProject)' == 'true'"><RunSettingsFilePath>$(MSBuildThisFileDirectory)Library.runsettings</RunSettingsFilePath></PropertyGroup></Project>
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup Condition="'$(IsTestProject)' == 'true'">
+    <!-- 让Visual Studio和命令行共用根目录测试设置。 -->
+    <RunSettingsFilePath>$(MSBuildThisFileDirectory)Library.runsettings</RunSettingsFilePath>
+  </PropertyGroup>
+</Project>

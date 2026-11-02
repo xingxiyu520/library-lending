@@ -1,0 +1,24 @@
+@* 未归还误录的删除确认页，提交时服务端重新核验归还状态。 *@
+@model Loan
+@{ ViewData["Title"] = "Delete mistaken loan"; }
+@* GET只展示摘要；POST使用防伪令牌，并由服务端再次核对归还状态。 *@
+<p class="eyebrow">CIRCULATION</p>
+<h1>Delete mistaken loan</h1>
+<section class="card form-card">
+<h2>Confirm delete</h2>
+<p>
+<strong>@Model.Book.Title</strong> · @Model.Reader.Name</p>
+<p>Borrowed @Model.BorrowDate.ToString("yyyy-MM-dd") · Due @Model.DueDate.ToString("yyyy-MM-dd")</p>
+<p class="muted">Only an outstanding mistaken record can be removed. Returned loan records must be retained.</p>
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">@if(Model.ReturnDate is null){
+<button type="submit">Delete mistaken loan</button>
+}<a asp-action="Index">Cancel</a>
+</div>
+</form>
+</section>

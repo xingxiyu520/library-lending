@@ -1,3 +1,41 @@
+@* 账号登录页；服务端验证凭据和防伪令牌，密码控件不回填。 *@
 @model LoginInput
 @{ ViewData["Title"] = "Sign in"; }
-<div class="login-layout"><section class="intro"><p class="eyebrow">YOUR LIBRARY, TOGETHER</p><h1>A place for every book.<br/>A simpler way to lend.</h1><p>Manage your collection and keep every loan in view.</p><div class="book-art" aria-hidden="true"><span>CATALOG</span><span>DISCOVER</span><span>BORROW</span></div></section><section class="card login-card"><p class="eyebrow">WELCOME BACK</p><h2>Sign in to your library</h2><p class="muted">Use the email and password for your account.</p><form method="post" asp-action="Login"><div asp-validation-summary="ModelOnly" class="validation" role="alert"></div><input asp-for="ReturnUrl" type="hidden"/><label asp-for="Email"></label><input asp-for="Email" autocomplete="username"/><span asp-validation-for="Email" class="validation"></span><label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password" value=""/><span asp-validation-for="Password" class="validation"></span><button type="submit">Sign in</button></form></section></div>
+@* 登录介绍与账号表单分区，小屏设备按样式纵向排列。 *@
+<div class="login-layout">
+<section class="intro">
+<p class="eyebrow">YOUR LIBRARY, TOGETHER</p>
+<h1>A place for every book.<br/>A simpler way to lend.</h1>
+<p>Manage your collection and keep every loan in view.</p>
+<div class="book-art" aria-hidden="true">
+<span>CATALOG</span>
+<span>DISCOVER</span>
+<span>BORROW</span>
+</div>
+</section>
+<section class="card login-card">
+<p class="eyebrow">WELCOME BACK</p>
+<h2>Sign in to your library</h2>
+<p class="muted">Use the email and password for your account.</p>
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form method="post" asp-action="Login">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+<input asp-for="ReturnUrl" type="hidden"/>
+@* 邮箱输入与字段错误提示，服务端规范化后参与账号操作。 *@
+<label asp-for="Email">
+</label>
+<input asp-for="Email" autocomplete="username"/>
+<span asp-validation-for="Email" class="validation">
+</span>
+@* 密码输入只用于提交，不在验证失败页面回填。 *@
+<label asp-for="Password">
+</label>
+<input asp-for="Password" autocomplete="current-password" value=""/>
+<span asp-validation-for="Password" class="validation">
+</span>
+<button type="submit">Sign in</button>
+</form>
+</section>
+</div>

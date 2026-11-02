@@ -1,9 +1,11 @@
+# 编译与IDE缓存不属于程序源码。
 **/bin/
 **/obj/
 .vs/
 .idea/
 TestResults/
 artifacts/
+# 本机工具、随机凭据及环境配置仅保留本地。
 .local/
 .env
 .env.*
@@ -14,10 +16,12 @@ artifacts/
 PRD.md
 Sprint_Plan.md
 
+# 原始测试结果和运行日志不提交。
 *.trx
 *.diag
 *.log
 
+# 开发记录、截图、报告与需求材料保留本地。
 evidence/
 proof/
 

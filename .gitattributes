@@ -1,3 +1,4 @@
+# 统一文本换行，解决方案保留Visual Studio使用的CRLF。
 * text=auto
 *.cs text eol=lf
 *.csproj text eol=lf

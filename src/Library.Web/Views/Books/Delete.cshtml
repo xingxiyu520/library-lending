@@ -1,3 +1,22 @@
+@* 馆藏删除确认页；存在任意借阅历史时服务端拒绝删除。 *@
 @model Book
 @{ ViewData["Title"] = "Delete book"; }
-<p class="eyebrow">COLLECTION</p><h1>Delete book?</h1><section class="card form-card"><p><strong>@Model.Title</strong></p><p class="muted">ISBN: @Model.Isbn. Books with any loan history are protected from deletion.</p><form asp-action="Delete" asp-route-id="@Model.Id" method="post"><div asp-validation-summary="ModelOnly" class="validation" role="alert"></div><div class="form-actions"><button type="submit">Confirm delete</button><a asp-action="Index">Cancel</a></div></form></section>
+<p class="eyebrow">COLLECTION</p>
+<h1>Delete book?</h1>
+<section class="card form-card">
+<p>
+<strong>@Model.Title</strong>
+</p>
+<p class="muted">ISBN: @Model.Isbn. Books with any loan history are protected from deletion.</p>
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">
+<button type="submit">Confirm delete</button>
+<a asp-action="Index">Cancel</a>
+</div>
+</form>
+</section>

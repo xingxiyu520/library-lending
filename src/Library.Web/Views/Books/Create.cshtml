@@ -1,3 +1,48 @@
+@* 新增馆藏表单，ISBN、书名、作者和总册数在服务端再次验证。 *@
 @model BookInput
 @{ ViewData["Title"] = "Add book"; }
-<p class="eyebrow">COLLECTION</p><h1>Add a book</h1><section class="card form-card"><p class="muted">ISBN, title, author, and total copies are required.</p><form asp-action="Create" method="post"><div asp-validation-summary="ModelOnly" class="validation" role="alert"></div><label asp-for="Isbn"></label><input asp-for="Isbn" required/><span asp-validation-for="Isbn" class="validation"></span><label asp-for="Title"></label><input asp-for="Title" required/><span asp-validation-for="Title" class="validation"></span><label asp-for="Author"></label><input asp-for="Author" required/><span asp-validation-for="Author" class="validation"></span><label asp-for="Category">Category (optional)</label><input asp-for="Category"/><span asp-validation-for="Category" class="validation"></span><label asp-for="TotalCopies"></label><input asp-for="TotalCopies" type="number" min="0" step="1" required/><span asp-validation-for="TotalCopies" class="validation"></span><div class="form-actions"><button type="submit">Add book</button><a asp-action="Index">Cancel</a></div></form></section>
+<p class="eyebrow">COLLECTION</p>
+<h1>Add a book</h1>
+<section class="card form-card">
+<p class="muted">ISBN, title, author, and total copies are required.</p>
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Create" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+@* ISBN输入及字段错误提示，最终格式和唯一性由服务端校验。 *@
+<label asp-for="Isbn">
+</label>
+<input asp-for="Isbn" required/>
+<span asp-validation-for="Isbn" class="validation">
+</span>
+@* 书名输入及字段错误提示，空白值不能通过服务端验证。 *@
+<label asp-for="Title">
+</label>
+<input asp-for="Title" required/>
+<span asp-validation-for="Title" class="validation">
+</span>
+@* 作者输入与字段错误提示。 *@
+<label asp-for="Author">
+</label>
+<input asp-for="Author" required/>
+<span asp-validation-for="Author" class="validation">
+</span>
+@* 可选分类输入，长度由输入模型约束。 *@
+<label asp-for="Category">Category (optional)</label>
+<input asp-for="Category"/>
+<span asp-validation-for="Category" class="validation">
+</span>
+@* 总册数只接受非负整数，实际库存限制仍由服务端事务检查。 *@
+<label asp-for="TotalCopies">
+</label>
+<input asp-for="TotalCopies" type="number" min="0" step="1" required/>
+<span asp-validation-for="TotalCopies" class="validation">
+</span>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">
+<button type="submit">Add book</button>
+<a asp-action="Index">Cancel</a>
+</div>
+</form>
+</section>

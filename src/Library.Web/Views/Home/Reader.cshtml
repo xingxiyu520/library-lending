@@ -1,2 +1,12 @@
+@* 读者工作台，提供共享目录和个人借阅入口。 *@
 @{ ViewData["Title"] = "Welcome"; }
-<section class="card"><p class="eyebrow">READER WORKSPACE</p><h1>Welcome to your library.</h1><p>You are signed in with your reader account.</p><div class="form-actions"><a class="button" asp-controller="Books" asp-action="Index">Browse books</a><a asp-controller="MyLoans" asp-action="Index">View my loans →</a></div></section>
+<section class="card">
+<p class="eyebrow">READER WORKSPACE</p>
+<h1>Welcome to your library.</h1>
+<p>You are signed in with your reader account.</p>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">
+<a class="button" asp-controller="Books" asp-action="Index">Browse books</a>
+<a asp-controller="MyLoans" asp-action="Index">View my loans →</a>
+</div>
+</section>

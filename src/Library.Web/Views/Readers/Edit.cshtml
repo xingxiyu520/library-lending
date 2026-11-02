@@ -1,3 +1,36 @@
+@* 读者档案更正表单，账号邮箱同步由业务服务处理。 *@
 @model ReaderEditInput
 @{ ViewData["Title"] = "Edit reader"; }
-<p class="eyebrow">COMMUNITY</p><h1>Edit reader</h1><section class="card form-card"><p class="muted">Email changes also update the login account. Existing sessions will require sign-in again.</p><form asp-action="Edit" asp-route-id="@ViewData["Id"]" method="post"><div asp-validation-summary="ModelOnly" class="validation" role="alert"></div><label asp-for="Name"></label><input asp-for="Name" required/><span asp-validation-for="Name" class="validation"></span><label asp-for="Email"></label><input asp-for="Email" type="email" required/><span asp-validation-for="Email" class="validation"></span><label asp-for="Phone">Phone (optional)</label><input asp-for="Phone"/><span asp-validation-for="Phone" class="validation"></span><div class="form-actions"><button type="submit">Save reader</button><a asp-action="Index">Cancel</a></div></form></section>
+<p class="eyebrow">COMMUNITY</p>
+<h1>Edit reader</h1>
+<section class="card form-card">
+<p class="muted">Email changes also update the login account. Existing sessions will require sign-in again.</p>
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Edit" asp-route-id="@ViewData["Id"]" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+@* 读者姓名输入及服务端错误提示。 *@
+<label asp-for="Name">
+</label>
+<input asp-for="Name" required/>
+<span asp-validation-for="Name" class="validation">
+</span>
+@* 邮箱输入与字段错误提示，服务端规范化后参与账号操作。 *@
+<label asp-for="Email">
+</label>
+<input asp-for="Email" type="email" required/>
+<span asp-validation-for="Email" class="validation">
+</span>
+@* 可选电话号码输入及错误提示。 *@
+<label asp-for="Phone">Phone (optional)</label>
+<input asp-for="Phone"/>
+<span asp-validation-for="Phone" class="validation">
+</span>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">
+<button type="submit">Save reader</button>
+<a asp-action="Index">Cancel</a>
+</div>
+</form>
+</section>

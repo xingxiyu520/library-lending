@@ -1,5 +1,60 @@
+@* 共享馆藏目录，管理员显示维护链接；列表仅展示服务端查询结果。 *@
 @model BookCatalog
 @{ ViewData["Title"] = "Books"; var admin = User.IsInRole("Admin"); }
-<div class="page-heading"><div><p class="eyebrow">COLLECTION</p><h1>Books</h1><p class="muted">@Model.Books.Count matching titles</p></div>@if(admin){<a class="button" asp-action="Create">+ Add book</a>}</div>
-<form method="get" class="search-bar"><div><label for="q">Search title, author or ISBN</label><input id="q" name="q" value="@Model.Query" maxlength="200" /></div><div><label for="sort">Sort by</label><select id="sort" name="sort">@foreach(var option in new[]{("title","Title A–Z"),("title_desc","Title Z–A"),("available","Available: low to high"),("available_desc","Available: high to low")}){<option value="@option.Item1" selected="@(Model.Sort == option.Item1)">@option.Item2</option>}</select></div><button type="submit">Search</button><a asp-action="Index">Clear</a></form>
-<div class="table-wrap"><table><thead><tr><th>Title / ISBN</th><th>Author</th><th>Category</th><th>Total copies</th><th>Available</th>@if(admin){<th>Manage</th>}</tr></thead><tbody>@foreach(var book in Model.Books){<tr data-book-id="@book.Id"><td><strong>@book.Title</strong><small>@book.Isbn</small></td><td>@book.Author</td><td>@(book.Category ?? "—")</td><td>@book.TotalCopies</td><td><span class="badge">@book.AvailableCopies available</span></td>@if(admin){<td><a asp-action="Edit" asp-route-id="@book.Id">Edit</a> · <a asp-action="Delete" asp-route-id="@book.Id">Delete</a></td>}</tr>}</tbody></table>@if(Model.Books.Count == 0){<p class="empty">No books match your search.</p>}</div>
+@* 页面标题、结果数量与当前角色可用操作。 *@
+<div class="page-heading">
+<div>
+<p class="eyebrow">COLLECTION</p>
+<h1>Books</h1>
+<p class="muted">@Model.Books.Count matching titles</p>
+</div>@if(admin){
+<a class="button" asp-action="Create">+ Add book</a>
+}</div>
+@* 查询仅通过GET提交，清空入口移除筛选参数。 *@
+<form method="get" class="search-bar">
+<div>
+<label for="q">Search title, author or ISBN</label>
+<input id="q" name="q" value="@Model.Query" maxlength="200" />
+</div>
+<div>
+<label for="sort">Sort by</label>
+<select id="sort" name="sort">@foreach(var option in new[]{("title","Title A–Z"),("title_desc","Title Z–A"),("available","Available: low to high"),("available_desc","Available: high to low")}){
+<option value="@option.Item1" selected="@(Model.Sort == option.Item1)">@option.Item2</option>
+}</select>
+</div>
+<button type="submit">Search</button>
+<a asp-action="Index">Clear</a>
+</form>
+@* 结果表格保留行标识供端到端测试定位，动态文本由Razor编码输出。 *@
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Title / ISBN</th>
+<th>Author</th>
+<th>Category</th>
+<th>Total copies</th>
+<th>Available</th>@if(admin){
+<th>Manage</th>
+}</tr>
+</thead>
+<tbody>@foreach(var book in Model.Books){
+<tr data-book-id="@book.Id">
+<td>
+<strong>@book.Title</strong>
+<small>@book.Isbn</small>
+</td>
+<td>@book.Author</td>
+<td>@(book.Category ?? "—")</td>
+<td>@book.TotalCopies</td>
+<td>
+<span class="badge">@book.AvailableCopies available</span>
+</td>@if(admin){
+<td>
+<a asp-action="Edit" asp-route-id="@book.Id">Edit</a> · <a asp-action="Delete" asp-route-id="@book.Id">Delete</a>
+</td>
+}</tr>
+}</tbody>
+</table>@if(Model.Books.Count == 0){
+<p class="empty">No books match your search.</p>
+}</div>

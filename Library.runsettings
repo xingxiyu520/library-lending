@@ -1,1 +1,15 @@
-<?xml version="1.0" encoding="utf-8"?><RunSettings><RunConfiguration><MaxCpuCount>1</MaxCpuCount><ResultsDirectory>TestResults</ResultsDirectory><TestSessionTimeout>300000</TestSessionTimeout></RunConfiguration><MSTest><MapInconclusiveToFailed>true</MapInconclusiveToFailed></MSTest></RunSettings>
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <RunConfiguration>
+    <!-- 测试串行运行，避免共享浏览器Host和隔离库的生命周期竞争。 -->
+    <MaxCpuCount>1</MaxCpuCount>
+    <!-- 原始测试结果只写入忽略目录。 -->
+    <ResultsDirectory>TestResults</ResultsDirectory>
+    <!-- 会话上限十分钟，覆盖三档持续JMeter负载及功能回归。 -->
+    <TestSessionTimeout>600000</TestSessionTimeout>
+  </RunConfiguration>
+  <MSTest>
+    <!-- 不确定结果按失败处理，禁止把缺失环境视为通过。 -->
+    <MapInconclusiveToFailed>true</MapInconclusiveToFailed>
+  </MSTest>
+</RunSettings>

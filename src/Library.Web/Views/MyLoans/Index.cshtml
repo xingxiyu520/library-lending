@@ -1,4 +1,46 @@
-@model MyLoansPage
+@* 读者个人借阅列表，只展示已按登录身份限制的数据和档案缺失提示。 *@
+@model LoanListPage
 @{ ViewData["Title"] = "My loans"; }
-<p class="eyebrow">READER WORKSPACE</p><h1>My loans</h1><p class="muted">Your borrowing history and return dates.</p>
-@if(Model.MissingProfile){<section class="card"><p role="alert">Your account is not linked to an active reader profile. Please contact your librarian.</p></section>}else{<div class="table-wrap"><table><thead><tr><th>Book</th><th>Borrowed</th><th>Due date</th><th>Returned</th><th>Status</th></tr></thead><tbody>@foreach(var loan in Model.Loans){<tr data-loan-id="@loan.Id"><td><strong>@loan.Title</strong></td><td>@loan.BorrowDate.ToString("yyyy-MM-dd")</td><td>@loan.DueDate.ToString("yyyy-MM-dd")</td><td>@(loan.ReturnDate?.ToString("yyyy-MM-dd") ?? "—")</td><td><span class="badge @(loan.Status == "Overdue" ? "overdue" : "")">@loan.Status</span></td></tr>}</tbody></table>@if(Model.Loans.Count == 0){<p class="empty">You have no loan records yet.</p>}</div>}
+@* 读者视图不输出读者管理字段，也不提供任何借阅写操作。 *@
+<p class="eyebrow">READER WORKSPACE</p>
+<h1>My loans</h1>
+<p class="muted">Your borrowing history and return dates.</p>
+@if(Model.MissingProfile){
+ <section class="card">
+<p role="alert">Your account is not linked to an active reader profile. Please contact your librarian.</p>
+</section>
+}else{
+ <partial name="_LoanFilters" model="Model"/>
+@* 结果表格保留行标识供端到端测试定位，动态文本由Razor编码输出。 *@
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Book</th>
+<th>Borrowed</th>
+<th>Due date</th>
+<th>Returned</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+ @foreach(var loan in Model.Loans){
+<tr data-loan-id="@loan.Id">
+<td>
+<strong>@loan.Title</strong>
+</td>
+<td>@loan.BorrowDate.ToString("yyyy-MM-dd")</td>
+<td>@loan.DueDate.ToString("yyyy-MM-dd")</td>
+<td>@(loan.ReturnDate?.ToString("yyyy-MM-dd") ?? "—")</td>
+<td>
+<span class="badge @(loan.Status == "Overdue" ? "overdue" : "")">@loan.Status</span>
+</td>
+</tr>
+}
+ </tbody>
+</table>
+ @if(Model.Loans.Count == 0){
+<p class="empty">@(Model.Filters.Query.Length > 0 || Model.Filters.Status != "all" ? "No loans match your search." : "You have no loan records yet.")</p>
+}
+ </div>
+}

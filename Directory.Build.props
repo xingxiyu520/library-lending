@@ -1,1 +1,11 @@
-<Project><PropertyGroup><AnalysisLevel>latest</AnalysisLevel><EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild><Deterministic>true</Deterministic></PropertyGroup></Project>
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- 启用SDK提供的静态分析规则。 -->
+    <AnalysisLevel>latest</AnalysisLevel>
+    <!-- 构建时执行代码风格分析。 -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <!-- 相同输入生成确定性程序集。 -->
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+</Project>

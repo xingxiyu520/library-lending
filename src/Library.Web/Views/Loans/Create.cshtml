@@ -1,3 +1,48 @@
+@* 管理员借出登记表单，通过唯一请求标识处理重复提交。 *@
 @model LoanInput
 @{ ViewData["Title"] = "Record loan"; }
-<p class="eyebrow">CIRCULATION</p><h1>Record a loan</h1><section class="card form-card"><p class="muted">All fields are required. Each loan reserves one copy.</p><form asp-action="Create" method="post"><div asp-validation-summary="All" class="validation" role="alert"></div><input asp-for="RequestId" type="hidden"/><label asp-for="BookId"></label><select asp-for="BookId" asp-items="Model.Books" required><option value="">Choose a book</option></select><span asp-validation-for="BookId" class="validation"></span><label asp-for="ReaderId"></label><select asp-for="ReaderId" asp-items="Model.Readers" required><option value="">Choose a reader</option></select><span asp-validation-for="ReaderId" class="validation"></span><label asp-for="BorrowDate"></label><input asp-for="BorrowDate" type="date" required/><span asp-validation-for="BorrowDate" class="validation"></span><label asp-for="DueDate"></label><input asp-for="DueDate" type="date" required/><span asp-validation-for="DueDate" class="validation"></span><div class="form-actions"><button type="submit">Record loan</button><a asp-action="Index">Cancel</a></div></form></section>
+<p class="eyebrow">CIRCULATION</p>
+<h1>Record a loan</h1>
+<section class="card form-card">
+<p class="muted">All fields are required. Each loan reserves one copy.</p>
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Create" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="All" class="validation" role="alert">
+</div>
+<input asp-for="RequestId" type="hidden"/>
+@* 图书下拉选项，仅提交标识，库存由服务端重新核对。 *@
+<label asp-for="BookId">
+</label>
+<select asp-for="BookId" asp-items="Model.Books" required>
+<option value="">Choose a book</option>
+</select>
+<span asp-validation-for="BookId" class="validation">
+</span>
+@* 读者下拉选项，仅管理员登记时使用；读者查询身份不接受此字段。 *@
+<label asp-for="ReaderId">
+</label>
+<select asp-for="ReaderId" asp-items="Model.Readers" required>
+<option value="">Choose a reader</option>
+</select>
+<span asp-validation-for="ReaderId" class="validation">
+</span>
+@* 借出日期输入，不能晚于业务当天。 *@
+<label asp-for="BorrowDate">
+</label>
+<input asp-for="BorrowDate" type="date" required/>
+<span asp-validation-for="BorrowDate" class="validation">
+</span>
+@* 应还日期输入，不能早于借出日期。 *@
+<label asp-for="DueDate">
+</label>
+<input asp-for="DueDate" type="date" required/>
+<span asp-validation-for="DueDate" class="validation">
+</span>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">
+<button type="submit">Record loan</button>
+<a asp-action="Index">Cancel</a>
+</div>
+</form>
+</section>

@@ -1,3 +1,29 @@
+@* 管理员归还确认表单，只提交实际归还日期。 *@
 @model ReturnInput
 @{ ViewData["Title"] = "Return book"; var loan = (Loan)ViewData["Loan"]!; }
-<p class="eyebrow">CIRCULATION</p><h1>Return book</h1><section class="card form-card"><p><strong>@loan.Book.Title</strong></p><p class="muted">Borrowed @loan.BorrowDate.ToString("yyyy-MM-dd") · Due @loan.DueDate.ToString("yyyy-MM-dd")</p>@if(loan.ReturnDate.HasValue){<p class="notice">This loan has already been returned on @loan.ReturnDate.Value.ToString("yyyy-MM-dd").</p>}<form asp-action="Return" asp-route-id="@loan.Id" method="post"><div asp-validation-summary="ModelOnly" class="validation" role="alert"></div><label asp-for="ReturnDate"></label><input asp-for="ReturnDate" type="date" required/><span asp-validation-for="ReturnDate" class="validation"></span><div class="form-actions">@if(!loan.ReturnDate.HasValue){<button type="submit">Confirm return</button>}<a asp-action="Index">Back to loans</a></div></form></section>
+<p class="eyebrow">CIRCULATION</p>
+<h1>Return book</h1>
+<section class="card form-card">
+<p>
+<strong>@loan.Book.Title</strong>
+</p>
+<p class="muted">Borrowed @loan.BorrowDate.ToString("yyyy-MM-dd") · Due @loan.DueDate.ToString("yyyy-MM-dd")</p>@if(loan.ReturnDate.HasValue){
+<p class="notice">This loan has already been returned on @loan.ReturnDate.Value.ToString("yyyy-MM-dd").</p>
+}@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Return" asp-route-id="@loan.Id" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+@* 实际归还日期输入，需处于借出日到业务当天之间。 *@
+<label asp-for="ReturnDate">
+</label>
+<input asp-for="ReturnDate" type="date" required/>
+<span asp-validation-for="ReturnDate" class="validation">
+</span>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">@if(!loan.ReturnDate.HasValue){
+<button type="submit">Confirm return</button>
+}<a asp-action="Index">Back to loans</a>
+</div>
+</form>
+</section>

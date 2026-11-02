@@ -1,2 +1,26 @@
+@* 管理员工作台，提供馆藏、读者及借阅维护入口。 *@
 @{ ViewData["Title"] = "Overview"; }
-<p class="eyebrow">LIBRARY WORKSPACE · ADMIN</p><h1>Keep the next chapter moving.</h1><p class="lead">Your collection, your readers, and every book in between.</p><div class="grid"><a class="card action" asp-controller="Books" asp-action="Index"><span class="number">01</span><h2>Books</h2><p>View your collection and add new titles.</p><span>Open catalog →</span></a><a class="card action" asp-controller="Readers" asp-action="Index"><span class="number">02</span><h2>Readers</h2><p>Create reader profiles and library accounts.</p><span>Manage readers →</span></a><a class="card action" asp-controller="Loans" asp-action="Index"><span class="number">03</span><h2>Loans</h2><p>Record a loan and track its due date.</p><span>View loans →</span></a></div>
+<p class="eyebrow">LIBRARY WORKSPACE · ADMIN</p>
+<h1>Keep the next chapter moving.</h1>
+<p class="lead">Your collection, your readers, and every book in between.</p>
+@* 工作台功能入口按当前控制器授权对应可用操作。 *@
+<div class="grid">
+<a class="card action" asp-controller="Books" asp-action="Index">
+<span class="number">01</span>
+<h2>Books</h2>
+<p>View your collection and add new titles.</p>
+<span>Open catalog →</span>
+</a>
+<a class="card action" asp-controller="Readers" asp-action="Index">
+<span class="number">02</span>
+<h2>Readers</h2>
+<p>Create reader profiles and library accounts.</p>
+<span>Manage readers →</span>
+</a>
+<a class="card action" asp-controller="Loans" asp-action="Index">
+<span class="number">03</span>
+<h2>Loans</h2>
+<p>Record a loan and track its due date.</p>
+<span>View loans →</span>
+</a>
+</div>

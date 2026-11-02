@@ -1,3 +1,21 @@
+@* 读者删除确认页，有借阅历史的档案受到保护。 *@
 @model Reader
 @{ ViewData["Title"] = "Delete reader"; }
-<p class="eyebrow">COMMUNITY</p><h1>Delete reader?</h1><section class="card form-card"><p><strong>@Model.Name</strong> — @Model.Email</p><p class="muted">This also removes the login account and ends its access. Readers with any loan history cannot be deleted.</p><form asp-action="Delete" asp-route-id="@Model.Id" method="post"><div asp-validation-summary="ModelOnly" class="validation" role="alert"></div><div class="form-actions"><button type="submit">Confirm delete</button><a asp-action="Index">Cancel</a></div></form></section>
+<p class="eyebrow">COMMUNITY</p>
+<h1>Delete reader?</h1>
+<section class="card form-card">
+<p>
+<strong>@Model.Name</strong> — @Model.Email</p>
+<p class="muted">This also removes the login account and ends its access. Readers with any loan history cannot be deleted.</p>
+@* 提交表单由标签助手生成防伪字段，服务端负责授权和业务校验。 *@
+<form asp-action="Delete" asp-route-id="@Model.Id" method="post">
+@* 展示跨字段、业务规则及事务失败信息。 *@
+<div asp-validation-summary="ModelOnly" class="validation" role="alert">
+</div>
+@* 确认按钮触发提交，取消链接返回列表且不写入数据。 *@
+<div class="form-actions">
+<button type="submit">Confirm delete</button>
+<a asp-action="Index">Cancel</a>
+</div>
+</form>
+</section>

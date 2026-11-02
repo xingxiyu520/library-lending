@@ -1,0 +1,24 @@
+@* 借阅共用GET筛选器，按角色显示关键词说明并回填当前条件。 *@
+@model LoanListPage
+@* 借阅列表共用的GET查询表单；保留当前条件，清空时回到同一权限入口。 *@
+@* 查询仅通过GET提交，清空入口移除筛选参数。 *@
+<form method="get" class="search-form" role="search">
+<label for="q">@(Model.IsReader ? "Book title" : "Book title or reader name")</label>
+<input id="q" name="q" value="@Model.Filters.Query" placeholder="@(Model.IsReader ? "Search your loans" : "Search loans")"/>
+<label for="status">Status</label>
+<select id="status" name="status">
+<option value="all" selected="@(Model.Filters.Status == "all")">All</option>
+<option value="outstanding" selected="@(Model.Filters.Status == "outstanding")">Outstanding</option>
+<option value="returned" selected="@(Model.Filters.Status == "returned")">Returned</option>
+<option value="overdue" selected="@(Model.Filters.Status == "overdue")">Overdue</option>
+</select>
+<label for="sort">Sort</label>
+<select id="sort" name="sort">
+<option value="borrow_desc" selected="@(Model.Filters.Sort == "borrow_desc")">Borrowed newest</option>
+<option value="borrow" selected="@(Model.Filters.Sort == "borrow")">Borrowed oldest</option>
+<option value="due" selected="@(Model.Filters.Sort == "due")">Due earliest</option>
+<option value="due_desc" selected="@(Model.Filters.Sort == "due_desc")">Due latest</option>
+</select>
+<button type="submit">Apply</button>
+<a asp-action="Index">Clear</a>
+</form>

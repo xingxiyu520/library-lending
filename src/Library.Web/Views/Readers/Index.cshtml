@@ -1,5 +1,54 @@
+@* 管理员读者目录，支持姓名邮箱查询和姓名排序。 *@
 @model ReaderDirectory
 @{ ViewData["Title"] = "Readers"; }
-<div class="page-heading"><div><p class="eyebrow">COMMUNITY</p><h1>Readers</h1><p class="muted">@Model.Readers.Count matching reader profiles</p></div><a class="button" asp-action="Create">+ Create reader</a></div>
-<form method="get" class="search-bar"><div><label for="q">Search name or email</label><input id="q" name="q" value="@Model.Query" maxlength="256" /></div><div><label for="sort">Sort by name</label><select id="sort" name="sort"><option value="name" selected="@(Model.Sort == "name")">Name A–Z</option><option value="name_desc" selected="@(Model.Sort == "name_desc")">Name Z–A</option></select></div><button type="submit">Search</button><a asp-action="Index">Clear</a></form>
-<div class="table-wrap"><table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Manage</th></tr></thead><tbody>@foreach(var reader in Model.Readers){<tr data-reader-id="@reader.Id"><td><strong>@reader.Name</strong></td><td>@reader.Email</td><td>@(reader.Phone ?? "—")</td><td><a asp-action="Edit" asp-route-id="@reader.Id">Edit</a> · <a asp-action="Delete" asp-route-id="@reader.Id">Delete</a></td></tr>}</tbody></table>@if(Model.Readers.Count == 0){<p class="empty">No readers match your search.</p>}</div>
+@* 页面标题、结果数量与当前角色可用操作。 *@
+<div class="page-heading">
+<div>
+<p class="eyebrow">COMMUNITY</p>
+<h1>Readers</h1>
+<p class="muted">@Model.Readers.Count matching reader profiles</p>
+</div>
+<a class="button" asp-action="Create">+ Create reader</a>
+</div>
+@* 查询仅通过GET提交，清空入口移除筛选参数。 *@
+<form method="get" class="search-bar">
+<div>
+<label for="q">Search name or email</label>
+<input id="q" name="q" value="@Model.Query" maxlength="256" />
+</div>
+<div>
+<label for="sort">Sort by name</label>
+<select id="sort" name="sort">
+<option value="name" selected="@(Model.Sort == "name")">Name A–Z</option>
+<option value="name_desc" selected="@(Model.Sort == "name_desc")">Name Z–A</option>
+</select>
+</div>
+<button type="submit">Search</button>
+<a asp-action="Index">Clear</a>
+</form>
+@* 结果表格保留行标识供端到端测试定位，动态文本由Razor编码输出。 *@
+<div class="table-wrap">
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Email</th>
+<th>Phone</th>
+<th>Manage</th>
+</tr>
+</thead>
+<tbody>@foreach(var reader in Model.Readers){
+<tr data-reader-id="@reader.Id">
+<td>
+<strong>@reader.Name</strong>
+</td>
+<td>@reader.Email</td>
+<td>@(reader.Phone ?? "—")</td>
+<td>
+<a asp-action="Edit" asp-route-id="@reader.Id">Edit</a> · <a asp-action="Delete" asp-route-id="@reader.Id">Delete</a>
+</td>
+</tr>
+}</tbody>
+</table>@if(Model.Readers.Count == 0){
+<p class="empty">No readers match your search.</p>
+}</div>
