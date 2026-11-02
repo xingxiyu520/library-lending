@@ -15,6 +15,21 @@ namespace Library.Web.Controllers;
    ModelState.AddModelError("", result.Error!);
   } return View(await Choices(input));
  }
+ [HttpGet] public async Task<IActionResult> Return(int id) {
+  var loan = await db.Loans.AsNoTracking().Include(x => x.Book).SingleOrDefaultAsync(x => x.Id == id);
+  if (loan is null) return NotFound(); ViewData["Loan"] = loan;
+  return View(new ReturnInput { ReturnDate = clock.Today });
+ }
+ [HttpPost] public async Task<IActionResult> Return(int id, ReturnInput input) {
+  var loan = await db.Loans.AsNoTracking().Include(x => x.Book).SingleOrDefaultAsync(x => x.Id == id);
+  if (loan is null) return NotFound(); ViewData["Loan"] = loan;
+  if (ModelState.IsValid) {
+   var result = await service.ReturnAsync(id, input);
+   if (result.Success) { TempData["Success"] = "Book returned."; return RedirectToAction(nameof(Index)); }
+   ModelState.AddModelError("", result.Error!);
+  }
+  return View(input);
+ }
  private async Task<LoanInput> Choices(LoanInput input) {
   input.Books = await db.Books.OrderBy(x => x.Title).Select(x => new SelectListItem(x.Title + " (" + (x.TotalCopies - x.Loans.Count(l => l.ReturnDate == null)) + " available)", x.Id.ToString())).ToListAsync();
   input.Readers = await db.Readers.OrderBy(x => x.Name).Select(x => new SelectListItem(x.Name + " — " + x.Email, x.Id.ToString())).ToListAsync(); return input;

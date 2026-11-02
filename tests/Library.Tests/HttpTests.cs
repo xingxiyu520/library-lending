@@ -44,7 +44,7 @@ public class HttpTests {
   var token = await Token(client, "/"); var response = await client.PostAsync("/Account/Logout", new FormUrlEncodedContent(new Dictionary<string,string>{{"__RequestVerificationToken",token}}));
   Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode); StringAssert.Contains((await client.GetAsync("/Books")).Headers.Location!.ToString(), "/Account/Login");
  }
- [DataTestMethod][DataRow("/Books")][DataRow("/Readers")][DataRow("/Loans")][DataRow("/Books/Create")][DataRow("/Readers/Create")][DataRow("/Loans/Create")]
+ [DataTestMethod][DataRow("/Readers")][DataRow("/Loans")][DataRow("/Books/Create")][DataRow("/Readers/Create")][DataRow("/Loans/Create")]
  public async Task Reader_cannot_open_admin_pages(string path) {
   using var client = Client(); await Login(client, "reader@library.example", env.Password); var response = await client.GetAsync(path);
   Assert.AreEqual(HttpStatusCode.Redirect, response.StatusCode); StringAssert.Contains(response.Headers.Location!.ToString(), "/Account/Denied"); var denied=await client.GetAsync(response.Headers.Location); Assert.AreEqual(HttpStatusCode.Forbidden, denied.StatusCode);
@@ -75,7 +75,7 @@ public class HttpTests {
   using var client=Client(); await Login(client,"admin@library.example",env.Password); var email="reader"+Guid.NewGuid().ToString("N")+"@library.example";
   var response=await Post(client,"/Readers/Create",new(){["Name"]="New Reader",["Email"]=email,["Password"]=env.Password,["Role"]="Admin"}); Assert.AreEqual(HttpStatusCode.Redirect,response.StatusCode);
   using var reader=Client(); await Login(reader,email,env.Password); StringAssert.Contains(await reader.GetStringAsync("/"),"READER WORKSPACE");
-  StringAssert.Contains((await reader.GetAsync("/Books")).Headers.Location!.ToString(),"/Account/Denied");
+  StringAssert.Contains((await reader.GetAsync("/Books/Create")).Headers.Location!.ToString(),"/Account/Denied");
  }
  [TestMethod] public async Task Missing_loan_submission_token_is_rejected() {
   using var client=Client();await Login(client,"admin@library.example",env.Password);

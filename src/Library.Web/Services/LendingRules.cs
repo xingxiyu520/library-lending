@@ -2,6 +2,8 @@ namespace Library.Web.Services;
 public static class LendingRules {
  public static string NormalizeIsbn(string value) => string.Concat(value.Where(c => !char.IsWhiteSpace(c) && c != '-')).ToUpperInvariant();
  public static string? ValidateDates(DateOnly borrow, DateOnly due, DateOnly today) => borrow > today ? "Borrow date cannot be in the future." : due < borrow ? "Due date must be on or after borrow date." : null;
+ public static string? ValidateReturn(DateOnly borrow, DateOnly returned, DateOnly today) => returned < borrow ? "Return date cannot be before borrow date." : returned > today ? "Return date cannot be in the future." : null;
+ public static string LoanStatus(DateOnly due, DateOnly? returned, DateOnly today) => returned.HasValue ? "Returned" : due < today ? "Overdue" : "On loan";
  public static int AvailableCopies(int total, int outstanding) => Math.Max(0, total - outstanding);
 }
 public class BusinessClock(TimeProvider time) {

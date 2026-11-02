@@ -1,2 +1,2 @@
 @{ ViewData["Title"] = "Welcome"; }
-<section class="card"><p class="eyebrow">READER WORKSPACE</p><h1>Welcome to your library.</h1><p>You are signed in with your reader account.</p><p class="muted">Please contact your librarian for help with your current loans.</p></section>
+<section class="card"><p class="eyebrow">READER WORKSPACE</p><h1>Welcome to your library.</h1><p>You are signed in with your reader account.</p><div class="form-actions"><a class="button" asp-controller="Books" asp-action="Index">Browse books</a><a asp-controller="MyLoans" asp-action="Index">View my loans →</a></div></section>

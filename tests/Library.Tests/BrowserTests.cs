@@ -56,4 +56,33 @@ public class BrowserTests {
   driver.Manage().Window.Size=new System.Drawing.Size(390,844);driver.Navigate().GoToUrl(env.BrowserUrl+"/Account/Login");WaitText("Sign in to your library");
   var overflow=(bool)((IJavaScriptExecutor)driver).ExecuteScript("return document.documentElement.scrollWidth > window.innerWidth");Assert.IsFalse(overflow,"Login page should not overflow horizontally.");Assert.IsTrue(driver.FindElement(By.CssSelector("button[type=submit]")).Displayed);
  }
+
+ [TestMethod] public async Task Admin_maintains_book_reader_and_completes_return_in_browser() {
+  var key=Guid.NewGuid().ToString("N"); var email=key+"@library.example";
+  var book=await env.Use((s,_)=>s.AddBookAsync(new(){Isbn=key,Title="Return "+key,Author="Browser Author",TotalCopies=1}));
+  var reader=await env.Use((s,_)=>s.CreateReaderAsync(new(){Name="Return reader "+key,Email=email,Password=env.Password}));
+  Login("admin@library.example");WaitText("LIBRARY WORKSPACE · ADMIN");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books/Edit/"+book.Id);var title=driver.FindElement(By.Id("Title"));title.Clear();title.SendKeys("Edited "+key);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Book updated.");WaitText("Edited "+key);
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers/Edit/"+reader.Id);var name=driver.FindElement(By.Id("Name"));name.Clear();name.SendKeys("Edited reader "+key);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Reader and login account updated.");
+  var today=DateOnly.FromDateTime(DateTime.UtcNow.AddHours(8));var loan=await env.Use((s,_)=>s.LendAsync(new(){BookId=book.Id,ReaderId=reader.Id,BorrowDate=today,DueDate=today.AddDays(14),RequestId=Guid.NewGuid().ToString()}));Assert.IsTrue(loan.Success,loan.Error);
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Loans/Return/"+loan.Id);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Book returned.");
+  var loanRow=driver.FindElement(By.CssSelector($"tr[data-loan-id='{loan.Id}']"));StringAssert.Contains(loanRow.Text,"Returned");Assert.AreEqual(0,loanRow.FindElements(By.LinkText("Return")).Count);
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books?q="+key);var row=driver.FindElement(By.CssSelector($"tr[data-book-id='{book.Id}']"));StringAssert.Contains(row.Text,"1 available");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books/Delete/"+book.Id);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Books with loan history cannot be deleted.");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers/Delete/"+reader.Id);driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Readers with loan history cannot be deleted.");
+  driver.FindElement(By.CssSelector("nav button[type=submit]")).Click();WaitText("Sign in to your library");Login(email);WaitText("READER WORKSPACE");driver.FindElement(By.LinkText("My loans")).Click();WaitText("Edited "+key);WaitText("Returned");
+ }
+ [TestMethod] public async Task Reader_searches_sorts_catalogue_and_sees_only_own_loans_in_browser() {
+  var key=Guid.NewGuid().ToString("N");var first=await env.Use((s,_)=>s.AddBookAsync(new(){Isbn=key,Title="A "+key,Author="Browser search "+key,TotalCopies=1}));var second=await env.Use((s,_)=>s.AddBookAsync(new(){Isbn=Guid.NewGuid().ToString("N"),Title="B "+key,Author="Browser search "+key,TotalCopies=2}));
+  var reader=await env.Use((s,_)=>s.CreateReaderAsync(new(){Name="Own "+key,Email=key+"@library.example",Password=env.Password}));var other=await env.Use((s,_)=>s.CreateReaderAsync(new(){Name="Other "+key,Email="other"+key+"@library.example",Password=env.Password}));var today=DateOnly.FromDateTime(DateTime.UtcNow.AddHours(8));
+  Assert.IsTrue((await env.Use((s,_)=>s.LendAsync(new(){BookId=first.Id,ReaderId=reader.Id,BorrowDate=today.AddDays(-3),DueDate=today.AddDays(-1),RequestId=Guid.NewGuid().ToString()}))).Success);
+  Assert.IsTrue((await env.Use((s,_)=>s.LendAsync(new(){BookId=second.Id,ReaderId=other.Id,BorrowDate=today,DueDate=today.AddDays(14),RequestId=Guid.NewGuid().ToString()}))).Success);
+  Login(key+"@library.example");WaitText("READER WORKSPACE");driver.FindElement(By.LinkText("Books")).Click();WaitText("Books");driver.FindElement(By.Id("q")).SendKeys("Browser search "+key);new SelectElement(driver.FindElement(By.Id("sort"))).SelectByValue("available_desc");driver.FindElement(By.CssSelector("main button[type=submit]")).Click();wait.Until(d=>d.Url.Contains("sort=available_desc"));var rows=driver.FindElements(By.CssSelector("tbody tr"));Assert.AreEqual(2,rows.Count);StringAssert.Contains(rows[0].Text,"B "+key);Assert.AreEqual(0,driver.FindElements(By.CssSelector("main a[href*='/Books/Edit'],main a[href*='/Books/Delete']")).Count);
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Books?q=missing-"+key);WaitText("No books match your search.");driver.Navigate().GoToUrl(env.BrowserUrl+"/MyLoans?readerId="+other.Id);WaitText("A "+key);WaitText("Overdue");Assert.IsFalse(driver.FindElement(By.TagName("body")).Text.Contains("B "+key));
+ }
+ [TestMethod] public async Task Admin_confirms_deleting_unused_book_and_reader_in_browser() {
+  var key=Guid.NewGuid().ToString("N");var book=await env.Use((s,_)=>s.AddBookAsync(new(){Isbn=key,Title="Delete "+key,Author="Browser",TotalCopies=0}));var reader=await env.Use((s,_)=>s.CreateReaderAsync(new(){Name="Delete "+key,Email=key+"@library.example",Password=env.Password}));
+  Login("admin@library.example");WaitText("LIBRARY WORKSPACE · ADMIN");driver.Navigate().GoToUrl(env.BrowserUrl+"/Books/Delete/"+book.Id);WaitText("Confirm delete");driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Book deleted.");driver.Navigate().GoToUrl(env.BrowserUrl+"/Books?q="+key);WaitText("No books match your search.");
+  driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers/Delete/"+reader.Id);WaitText("Confirm delete");driver.FindElement(By.CssSelector("main button[type=submit]")).Click();WaitText("Reader and login account deleted.");driver.Navigate().GoToUrl(env.BrowserUrl+"/Readers?q="+key);WaitText("No readers match your search.");
+ }
 }

@@ -24,6 +24,13 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Configure JMeter
+        shell: pwsh
+        run: ./scripts/Install-JMeter.ps1
       - run: dotnet restore LibraryLending.sln
       - run: dotnet build LibraryLending.sln --configuration Release --no-restore --warnaserror
-      - run: dotnet test LibraryLending.sln --configuration Release --no-build -- --report-trx --results-directory TestResults --minimum-expected-tests 69 --no-progress
+      - run: dotnet test LibraryLending.sln --configuration Release --no-build -- --report-trx --results-directory TestResults --minimum-expected-tests 146 --no-progress

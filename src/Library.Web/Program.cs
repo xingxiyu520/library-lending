@@ -19,6 +19,8 @@ builder.Services.ConfigureApplicationCookie(o => {
  o.LoginPath = "/Account/Login"; o.AccessDeniedPath = "/Account/Denied"; o.Cookie.Name = "Library.Session";
  o.Cookie.HttpOnly = true; o.Cookie.SameSite = SameSiteMode.Lax; o.ExpireTimeSpan = TimeSpan.FromMinutes(30);
 });
+// Revalidate on every request so deleted or changed reader accounts lose existing sessions immediately.
+builder.Services.Configure<SecurityStampValidatorOptions>(o => o.ValidationInterval = TimeSpan.Zero);
 builder.Services.AddControllersWithViews(o => o.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()));
 builder.Services.AddSingleton(TimeProvider.System); builder.Services.AddScoped<BusinessClock>(); builder.Services.AddScoped<LibraryService>();
 var app = builder.Build();

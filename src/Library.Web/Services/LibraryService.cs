@@ -47,13 +47,82 @@ public class LibraryService(LibraryDbContext db, UserManager<IdentityUser> users
   if (book is null) return OperationResult.Fail("The selected book no longer exists.");
   var previous = await db.Loans.SingleOrDefaultAsync(x => x.RequestId == input.RequestId);
   if (previous is not null) return Matches(previous, input) ? OperationResult.Ok(previous.Id) : OperationResult.Fail("This submission token has already been used.");
-  if (!await db.Readers.AnyAsync(x => x.Id == input.ReaderId)) return OperationResult.Fail("The selected reader no longer exists.");
+  if (await db.Readers.FromSqlInterpolated($"SELECT * FROM Readers WHERE Id = {input.ReaderId} FOR UPDATE").SingleOrDefaultAsync() is null) return OperationResult.Fail("The selected reader no longer exists.");
   var outstanding = await db.Loans.CountAsync(x => x.BookId == book.Id && x.ReturnDate == null);
   if (outstanding >= book.TotalCopies) return OperationResult.Fail("No copies are available for this book.");
   var loan = new Loan { BookId = book.Id, ReaderId = input.ReaderId!.Value, BorrowDate = input.BorrowDate.Value, DueDate = input.DueDate.Value, RequestId = input.RequestId };
   db.Loans.Add(loan);
   try { await db.SaveChangesAsync(); await tx.CommitAsync(); return OperationResult.Ok(loan.Id); }
   catch (DbUpdateException ex) when (IsDuplicate(ex)) { db.ChangeTracker.Clear(); return OperationResult.Fail("This submission token has already been used."); }
+ }
+
+ public async Task<OperationResult> EditBookAsync(int id, BookInput input) {
+  if (Invalid(input) is { } error) return OperationResult.Fail(error);
+  var isbn = LendingRules.NormalizeIsbn(input.Isbn);
+  if (isbn.Length == 0) return OperationResult.Fail("ISBN is required.");
+  await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+  var book = await db.Books.FromSqlInterpolated($"SELECT * FROM Books WHERE Id = {id} FOR UPDATE").SingleOrDefaultAsync();
+  if (book is null) return OperationResult.Fail("Book not found.");
+  if (await db.Books.AnyAsync(x => x.Id != id && x.Isbn == isbn)) return OperationResult.Fail("A book with this ISBN already exists.");
+  var outstanding = await db.Loans.CountAsync(x => x.BookId == id && x.ReturnDate == null);
+  if (input.TotalCopies < outstanding) return OperationResult.Fail("Total copies cannot be less than outstanding loans.");
+  book.Isbn = isbn; book.Title = input.Title.Trim(); book.Author = input.Author.Trim();
+  book.Category = input.Category?.Trim(); book.TotalCopies = input.TotalCopies!.Value;
+  try { await db.SaveChangesAsync(); await tx.CommitAsync(); return OperationResult.Ok(id); }
+  catch (DbUpdateException ex) when (IsDuplicate(ex)) { db.ChangeTracker.Clear(); return OperationResult.Fail("A book with this ISBN already exists."); }
+ }
+ public async Task<OperationResult> DeleteBookAsync(int id) {
+  await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+  var book = await db.Books.FromSqlInterpolated($"SELECT * FROM Books WHERE Id = {id} FOR UPDATE").SingleOrDefaultAsync();
+  if (book is null) return OperationResult.Fail("Book not found.");
+  if (await db.Loans.AnyAsync(x => x.BookId == id)) return OperationResult.Fail("Books with loan history cannot be deleted.");
+  db.Books.Remove(book); await db.SaveChangesAsync(); await tx.CommitAsync(); return OperationResult.Ok(id);
+ }
+ public async Task<OperationResult> EditReaderAsync(int id, ReaderEditInput input) {
+  if (Invalid(input) is { } error) return OperationResult.Fail(error);
+  await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+  try {
+   var reader = await db.Readers.FromSqlInterpolated($"SELECT * FROM Readers WHERE Id = {id} FOR UPDATE").SingleOrDefaultAsync();
+   if (reader is null) return OperationResult.Fail("Reader not found.");
+   var user = await users.FindByIdAsync(reader.UserId);
+   if (user is null) return OperationResult.Fail("The reader account is unavailable.");
+   var email = input.Email.Trim().ToLowerInvariant();
+   user.Email = email; user.UserName = email; user.EmailConfirmed = true;
+   var updated = await users.UpdateAsync(user);
+   if (!updated.Succeeded) return OperationResult.Fail(string.Join(" ", updated.Errors.Select(x => x.Description)));
+   var stamped = await users.UpdateSecurityStampAsync(user);
+   if (!stamped.Succeeded) return OperationResult.Fail("The reader account could not be updated.");
+   reader.Name = input.Name.Trim(); reader.Email = email; reader.Phone = input.Phone?.Trim();
+   await db.SaveChangesAsync(); await tx.CommitAsync(); return OperationResult.Ok(id);
+  } catch (DbUpdateException ex) when (IsDuplicate(ex)) { return OperationResult.Fail("An account with this email already exists."); }
+  finally { db.ChangeTracker.Clear(); }
+ }
+ public async Task<OperationResult> DeleteReaderAsync(int id) {
+  await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+  try {
+   var reader = await db.Readers.FromSqlInterpolated($"SELECT * FROM Readers WHERE Id = {id} FOR UPDATE").SingleOrDefaultAsync();
+   if (reader is null) return OperationResult.Fail("Reader not found.");
+   if (await db.Loans.AnyAsync(x => x.ReaderId == id)) return OperationResult.Fail("Readers with loan history cannot be deleted.");
+   var user = await users.FindByIdAsync(reader.UserId);
+   if (user is null) return OperationResult.Fail("The reader account is unavailable.");
+   db.Readers.Remove(reader); await db.SaveChangesAsync();
+   var deleted = await users.DeleteAsync(user);
+   if (!deleted.Succeeded) return OperationResult.Fail("The reader account could not be deleted.");
+   await tx.CommitAsync(); return OperationResult.Ok(id);
+  } finally { db.ChangeTracker.Clear(); }
+ }
+ public async Task<OperationResult> ReturnAsync(int id, ReturnInput input) {
+  if (Invalid(input) is { } error) return OperationResult.Fail(error);
+  var bookId = await db.Loans.Where(x => x.Id == id).Select(x => (int?)x.BookId).SingleOrDefaultAsync();
+  if (!bookId.HasValue) return OperationResult.Fail("Loan not found.");
+  // Lending, quantity changes, deletion and returns acquire the same parent-book lock first.
+  await using var tx = await db.Database.BeginTransactionAsync(IsolationLevel.ReadCommitted);
+  await db.Books.FromSqlInterpolated($"SELECT * FROM Books WHERE Id = {bookId.Value} FOR UPDATE").SingleAsync();
+  var loan = await db.Loans.FromSqlInterpolated($"SELECT * FROM Loans WHERE Id = {id} FOR UPDATE").SingleOrDefaultAsync();
+  if (loan is null) return OperationResult.Fail("Loan not found.");
+  if (loan.ReturnDate.HasValue) return OperationResult.Fail("This loan has already been returned.");
+  if (LendingRules.ValidateReturn(loan.BorrowDate, input.ReturnDate!.Value, clock.Today) is { } dateError) return OperationResult.Fail(dateError);
+  loan.ReturnDate = input.ReturnDate; await db.SaveChangesAsync(); await tx.CommitAsync(); return OperationResult.Ok(id);
  }
  private static bool Matches(Loan l, LoanInput i) => l.BookId == i.BookId && l.ReaderId == i.ReaderId && l.BorrowDate == i.BorrowDate && l.DueDate == i.DueDate;
  private static bool IsDuplicate(DbUpdateException e) => e.InnerException is MySqlException { Number: 1062 };

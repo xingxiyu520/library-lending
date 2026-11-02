@@ -30,3 +30,16 @@ public class LoanInput {
  [ValidateNever] public List<SelectListItem> Readers { get; set; } = [];
 }
 public record BookRow(int Id, string Isbn, string Title, string Author, string? Category, int TotalCopies, int AvailableCopies);
+
+public class ReaderEditInput {
+ [Required, StringLength(100)] public string Name { get; set; } = "";
+ [Required, EmailAddress, StringLength(256)] public string Email { get; set; } = "";
+ [StringLength(30)] public string? Phone { get; set; }
+}
+public class ReturnInput {
+ [Required, DataType(DataType.Date), Display(Name = "Return date")] public DateOnly? ReturnDate { get; set; }
+}
+public record BookCatalog(IReadOnlyList<BookRow> Books, string Query, string Sort);
+public record ReaderDirectory(IReadOnlyList<Reader> Readers, string Query, string Sort);
+public record LoanRow(int Id, string Title, DateOnly BorrowDate, DateOnly DueDate, DateOnly? ReturnDate, string Status);
+public record MyLoansPage(IReadOnlyList<LoanRow> Loans, bool MissingProfile = false);
